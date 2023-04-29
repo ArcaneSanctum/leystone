@@ -6,7 +6,7 @@ require('dotenv').config();
 mongoose.connect(process.env.MONGO_URI);
 const database = mongoose.connection;
 
-database.on('error', () => {
+database.on('error', (error) => {
     console.error(error);
 });
 
@@ -15,15 +15,15 @@ database.once('connected', async () => {
 
     const db = require('./db');
 
-    // const newPlayers = await db.findNewPlayers(['rbm', 'llama']);
-    // console.log(newPlayers);
+    // const newCharacters = await db.findNewCharacters(['rbm', 'llama']);
+    // console.log(newCharacters);
 
     await db.deleteAllEvents();
-    await db.deleteAllPlayers();
-    await db.deleteAllPlayerEventBridges();
+    await db.deleteAllCharacters();
+    await db.deleteAllCharacterEventBridges();
     await db.deleteAllActions();
 
-    const players = await db.addPlayers(['rbm', 'llama']);
+    const characters = await db.addCharacters(['rbm', 'llama']);
     const Gelebron = await db.addAction({name: 'Gelebron', categoryValues: {
         'RAID': 1,
         'EDL': 7
@@ -33,8 +33,8 @@ database.once('connected', async () => {
         'LOWEDL': 4
     }});
 
-    await db.addEvent(Gelebron, [players.find(x => x.username === 'rbm'), players.find(x => x.username === 'llama')]);
-    await db.addEvent(Snorri, [players.find(x => x.username === 'rbm'), players.find(x => x.username === 'llama')]);
+    await db.addEvent(Gelebron, [characters.find(x => x.username === 'rbm'), characters.find(x => x.username === 'llama')]);
+    await db.addEvent(Snorri, [characters.find(x => x.username === 'rbm'), characters.find(x => x.username === 'llama')]);
 
     const filterByActionGelebron = '?config=%7B%22actionNames%22%3A%5B%22Gelebron%22%5D%7D';
     const filterByCategoryRaid = '?config=%7B%22categories%22%3A%5B%22RAID%22%5D%7D';
@@ -54,11 +54,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const playersRouter = require('./routes/players');
+const charactersRouter = require('./routes/characters');
 const eventsRouter = require('./routes/events');
 const actionsRouter = require('./routes/actions');
 
-app.use('/players', playersRouter);
+app.use('/characters', charactersRouter);
 app.use('/events', eventsRouter);
 app.use('/actions', actionsRouter);
 

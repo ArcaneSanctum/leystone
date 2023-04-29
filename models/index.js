@@ -1,12 +1,12 @@
-const Player = require('./Player');
+const Character = require('./Character');
 const Event = require('./Event');
-const PlayerEventBridge = require('./PlayerEventBridge');
+const CharacterEventBridge = require('./CharacterEventBridge');
 const Action = require('./Action');
 
 
 module.exports = {
-    Player,
+    Character,
     Event,
-    PlayerEventBridge,
+    CharacterEventBridge,
     Action
 }

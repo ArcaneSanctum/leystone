@@ -1,26 +1,24 @@
+const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
 
-const eventSchema = new mongoose.Schema({
+const clanSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+        unique: true,
         trim: true,
-        minlength: 3
+        minlength: 1
     },
     categoryValues: {
         type: Map,
         of: Number,
         required: true
     },
-    timestamp: { 
-        type: Date,
-        default: Date.now
-    }
 }, {
     timestamps: true
 });
 
-//create Character model
-const Event = mongoose.model('Event', eventSchema);
+//create clan model
+const Clan = mongoose.model('Clan', clanSchema);
 
-module.exports = Event;
+module.exports = Clan;

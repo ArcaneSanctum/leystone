@@ -1,44 +1,44 @@
-const { Player, Event, PlayerEventBridge, Action } = require('../models');
+const { Character, Event, CharacterEventBridge, Action } = require('../models');
 const { CATEGORIES } = require('../config.js');
 
-const getNewPlayers = async (usernames) => {
-    return await usernames.reduce(async (newPlayers, currentUsername) => {
-        newPlayers = await newPlayers;
-        return (await playerDoesNotExist(currentUsername)) ? newPlayers.concat([currentUsername]) : newPlayers;
+const getNewCharacters = async (usernames) => {
+    return await usernames.reduce(async (newCharacters, currentUsername) => {
+        newCharacters = await newCharacters;
+        return (await characterDoesNotExist(currentUsername)) ? newCharacters.concat([currentUsername]) : newCharacters;
     }, Promise.resolve([]));
 }
 
-const getAllPlayers = () => {
-    return Player.find();
+const getAllCharacters = () => {
+    return Character.find();
 }
 
-const getPlayerByUsername = (username) => {
-    return Player.findOne({username: username});
+const getCharacterByUsername = (username) => {
+    return Character.findOne({username: username});
 }
 
 const getEventById = (id) => {
     return Event.findOne({_id: id});
 }
 
-//Player.find({username: res.params.username})
+//Character.find({username: res.params.username})
 
-const getPlayerIdsByUsernames = (usernames) => {
-    return Player.find({
+const getCharacterIdsByUsernames = (usernames) => {
+    return Character.find({
         username: {
             $in: usernames
         }
     }, '_id');
 }
 
-const getEventsByPlayerUsername = async (username, config = {}) =>  {
-    const player = await getPlayerByUsername(username);
-    const playerId = player._id;
+const getEventsByCharacterUsername = async (username, config = {}) =>  {
+    const character = await getCharacterByUsername(username);
+    const characterId = character._id;
 
-    const nicknames = await getPlayerNicknamesByUsername(username);
+    const nicknames = await getCharacterNicknamesByUsername(username);
 
     const query = {
-        player: {
-            $in : [playerId, ...nicknames.map(nickname => nickname._id)]
+        character: {
+            $in : [characterId, ...nicknames.map(nickname => nickname._id)]
         }
     }
     
@@ -50,7 +50,7 @@ const getEventsByPlayerUsername = async (username, config = {}) =>  {
         $lt: upperTimeLimit
     }
 
-    const allBridgesForPlayerAndTimePeriod = await PlayerEventBridge.find(query);
+    const allBridgesForCharacterAndTimePeriod = await CharacterEventBridge.find(query);
     
 
     const categories = config.categories ||  (config.actionNames ? [] : CATEGORIES);
@@ -59,7 +59,7 @@ const getEventsByPlayerUsername = async (username, config = {}) =>  {
 
     let results = Event.find({
         _id: {
-            $in: allBridgesForPlayerAndTimePeriod.map(bridge => bridge.event)
+            $in: allBridgesForCharacterAndTimePeriod.map(bridge => bridge.event)
         }
     });
 
@@ -80,11 +80,11 @@ const getEventsByPlayerUsername = async (username, config = {}) =>  {
     return results;
 }
 
-const getPlayersByEventId = async (eventId) => {
-    const allBridgesForEventByPlayerId = await PlayerEventBridge.find({event: eventId});
-    return Player.find({
+const getCharactersByEventId = async (eventId) => {
+    const allBridgesForEventByCharacterId = await CharacterEventBridge.find({event: eventId});
+    return Character.find({
         _id: {
-            $in: allBridgesForEventByPlayerId.map(bridge => bridge.player)
+            $in: allBridgesForEventByCharacterId.map(bridge => bridge.character)
         }
     });
 }
@@ -99,30 +99,30 @@ const getAllActions = () => {
     return Action.find();
 }
 
-const playerDoesNotExist = async (username) => {
-    return ! ( await playerExists(username) );
+const characterDoesNotExist = async (username) => {
+    return ! ( await characterExists(username) );
 }
 
-const playerExists = (username) => {
-    return Player.exists({username});
+const characterExists = (username) => {
+    return Character.exists({username});
 }
 
-const getPlayerNicknamesByUsername = (username) => {
-    return Player.find({fullname: username}, 'username');
+const getCharacterNicknamesByUsername = (username) => {
+    return Character.find({fullname: username}, 'username');
 }
 
 
 module.exports = {
-    getNewPlayers,
-    getAllPlayers,
-    getPlayerByUsername,
+    getNewCharacters,
+    getAllCharacters,
+    getCharacterByUsername,
     getEventById,
-    getPlayerIdsByUsernames,
-    getEventsByPlayerUsername,
-    getPlayersByEventId,
+    getCharacterIdsByUsernames,
+    getEventsByCharacterUsername,
+    getCharactersByEventId,
     getActionByName,
     getAllActions,
-    playerDoesNotExist,
-    playerExists,
-    getPlayerNicknamesByUsername
+    characterDoesNotExist,
+    characterExists,
+    getCharacterNicknamesByUsername
 }

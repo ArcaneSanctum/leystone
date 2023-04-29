@@ -1,12 +1,12 @@
-const { Player, Event, PlayerEventBridge, Action} = require('../models')
+const { Character, Event, CharacterEventBridge, Action} = require('../models')
 
-const addPlayers = (usernames) => {
-    return Player.insertMany(
+const addCharacters = (usernames) => {
+    return Character.insertMany(
         usernames.map(username => ({username}))
     );
 }
 
-const addEvent = async (action, playerIds) => {
+const addEvent = async (action, characterIds) => {
     const newEvent = new Event({
         name: action.name, 
         categoryValues: action.categoryValues
@@ -14,8 +14,8 @@ const addEvent = async (action, playerIds) => {
     
     const eventData = await newEvent.save();
 
-    await PlayerEventBridge.insertMany(
-        playerIds.map(playerId => ({player: playerId, event: eventData._id, timestamp: eventData.timestamp}))
+    await CharacterEventBridge.insertMany(
+        characterIds.map(characterId => ({character: characterId, event: eventData._id, timestamp: eventData.timestamp}))
     );
 
     return eventData;
@@ -30,7 +30,7 @@ const addAction = async (config) => {
 }
 
 module.exports = {
-    addPlayers,
+    addCharacters,
     addEvent,
     addAction
 }

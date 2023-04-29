@@ -1,24 +1,24 @@
-const { Player, Event, PlayerEventBridge, Action } = require('../models');
+const { Character, Event, CharacterEventBridge, Action } = require('../models');
 
 const deleteEventById = async (id) => {
-    await deletePlayerEventBridgesByEventId(id);
+    await deleteCharacterEventBridgesByEventId(id);
     return Event.deleteOne({_id: id});
 }
 
-const deletePlayerEventBridgesByEventId = (eventId) => {
-    return PlayerEventBridge.deleteMany({ event: eventId });
+const deleteCharacterEventBridgesByEventId = (eventId) => {
+    return CharacterEventBridge.deleteMany({ event: eventId });
 }
 
-const deleteAllPlayers = () => {
-    return Player.deleteMany({});
+const deleteAllCharacters = () => {
+    return Character.deleteMany({});
 }
 
 const deleteAllEvents = () => {
     return Event.deleteMany({});
 }
 
-const deleteAllPlayerEventBridges = () => {
-    return PlayerEventBridge.deleteMany({});
+const deleteAllCharacterEventBridges = () => {
+    return CharacterEventBridge.deleteMany({});
 }
 
 const deleteAllActions = () => {
@@ -27,9 +27,9 @@ const deleteAllActions = () => {
 
 module.exports = {
     deleteEventById,
-    deletePlayerEventBridgesByEventId,
-    deleteAllPlayers,
+    deleteCharacterEventBridgesByEventId,
+    deleteAllCharacters,
     deleteAllEvents,
-    deleteAllPlayerEventBridges,
+    deleteAllCharacterEventBridges,
     deleteAllActions
 }

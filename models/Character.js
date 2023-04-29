@@ -1,7 +1,7 @@
 const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
 
-const playerSchema = new mongoose.Schema({
+const characterSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
@@ -17,7 +17,7 @@ const playerSchema = new mongoose.Schema({
     timestamps: true
 });
 
-//create Player model
-const Player = mongoose.model('Player', playerSchema);
+//create Character model
+const Character = mongoose.model('Character', characterSchema);
 
-module.exports = Player;
+module.exports = Character;

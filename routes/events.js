@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { ObjectId } = require('mongoose').Types;
-const { Player, Event } = require('../models');
+const { Character, Event } = require('../models');
 const db = require('../db');
 
 const { BadRequestErrorHandler, InternalServerErrorHandler } = require('../util/errorHandlers');
@@ -23,11 +23,11 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-//Get all players by event id
-router.get('/:id/players', async(req, res) => {
+//Get all characters by event id
+router.get('/:id/characters', async(req, res) => {
     try {
-        const players = await db.getPlayersByEventId(req.params.id);
-        res.json(players);
+        const characters = await db.getCharactersByEventId(req.params.id);
+        res.json(characters);
     } catch (error) {
         BadRequestErrorHandler(res)(error);
     }
@@ -36,7 +36,7 @@ router.get('/:id/players', async(req, res) => {
 // Create new event
 router.post('/', async (req, res) => {
     const actionName = req.body.actionName;
-    const playerUsernames = req.body.usernames;
+    const characterUsernames = req.body.usernames;
 
     try {
         //check for action
@@ -46,17 +46,17 @@ router.post('/', async (req, res) => {
         }
 
         //add new users to database
-        const newUsernames = await db.getNewPlayers(playerUsernames);
-        await db.addPlayers(newUsernames);
+        const newUsernames = await db.getNewCharacters(characterUsernames);
+        await db.addCharacters(newUsernames);
 
-        //retreive player Object IDs use to build PlayerEventBridges
-        const playerIds = await db.getPlayerIdsByUsernames(playerUsernames);
+        //retreive character Object IDs use to build CharacterEventBridges
+        const characterIds = await db.getCharacterIdsByUsernames(characterUsernames);
 
-        const eventData = await db.addEvent(action, playerIds);
+        const eventData = await db.addEvent(action, characterIds);
 
         res.json({
             event: eventData,
-            newPlayers: newUsernames
+            newCharacters: newUsernames
         }) 
     }
     catch (error) {
@@ -66,23 +66,23 @@ router.post('/', async (req, res) => {
 
 // Update event
 router.put('/:id', async (req, res) => {
-    const playerUsernames = req.body.usernames;
+    const characterUsernames = req.body.usernames;
     const timestamp = req.body.timestamp;
     const id = new ObjectId(req.params.id);
     
     try {
         //add new users to database
-        const newUsernames = await db.getNewPlayers(playerUsernames);
-        await db.addPlayers(newUsernames);
+        const newUsernames = await db.getNewCharacters(characterUsernames);
+        await db.addCharacters(newUsernames);
 
-        //retreive player Object IDs use to build PlayerEventBridges
-        const playerIds = await db.getPlayerIdsByUsernames(playerUsernames);
+        //retreive character Object IDs use to build CharacterEventBridges
+        const characterIds = await db.getCharacterIdsByUsernames(characterUsernames);
 
-        const eventData = await db.editEvent(id, playerIds, timestamp);
+        const eventData = await db.editEvent(id, characterIds, timestamp);
 
         res.json({
             event: eventData,
-            newPlayers: newUsernames
+            newCharacters: newUsernames
         });
     } catch (error)  {
         console.log(error);

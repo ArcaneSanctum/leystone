@@ -43,14 +43,14 @@ router.post('/', async (req, res) => {
 // Update action
 router.put('/:id', (req, res) => {
     Action.findByIdAndUpdate(req.params.id, req.body, {new: true})
-        .then(player => res.json(player))
+        .then(character => res.json(character))
         .catch(BadRequestErrorHandler(res));
 });
 
 // Delete action by id
 router.delete('/:id', (req, res) => {
     Action.findByIdAndDelete(req.params.id, req.body)
-        .then(player => res.json(player))
+        .then(character => res.json(character))
         .catch(BadRequestErrorHandler(res))
 });
 
