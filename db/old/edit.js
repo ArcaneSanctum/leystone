@@ -1,6 +1,6 @@
 const { Character, Event, CharacterEventBridge } = require('../models');
 const { ObjectId } = require('mongoose').Types;
-const { getArrayDifference } = require('../util/util');
+const { getArrayDifference } = require('../util/dbUtil');
 const db = require('./get.js');
 
 const editEvent = async (id, characterIds, timestamp) => {

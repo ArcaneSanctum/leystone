@@ -15,13 +15,7 @@ database.once('connected', async () => {
 
     const db = require('./db');
 
-    // const newCharacters = await db.findNewCharacters(['rbm', 'llama']);
-    // console.log(newCharacters);
-
-    await db.deleteAllEvents();
-    await db.deleteAllCharacters();
-    await db.deleteAllCharacterEventBridges();
-    await db.deleteAllActions();
+    await db.util.clearDb();
 
     const characters = await db.addCharacters(['rbm', 'llama']);
     const Gelebron = await db.addAction({name: 'Gelebron', categoryValues: {
@@ -57,10 +51,12 @@ app.use(express.json());
 const charactersRouter = require('./routes/characters');
 const eventsRouter = require('./routes/events');
 const actionsRouter = require('./routes/actions');
+const clansRouter = require('./routes/clans');
 
 app.use('/characters', charactersRouter);
 app.use('/events', eventsRouter);
 app.use('/actions', actionsRouter);
+app.use('/clans', clansRouter);
 
 app.listen(process.env.PORT, () => {
     console.log(`Server Started at port ${process.env.PORT}`);
