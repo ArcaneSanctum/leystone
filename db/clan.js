@@ -16,8 +16,30 @@ const getClanByDiscordGuildId = (discordGuildId) => {
     return Clan.findOne({discordGuildId});
 }
 
+const getClanByLineBoardId = (lineBoardId) => {
+    return Clan.findOne({lineBoardId});
+}
+
+const getClanIdByClanIdentifier = async (clanIdentifier, identifierType) => {
+    if (identifierType === 'discordGuildId') {
+        const clan = await getClanByDiscordGuildId(clanIdentifier);
+        return clan?._id;
+    }
+    else if (identifierType === 'lineBoardId') {
+        const clan = await getClanByLineBoardId(clanIdentifier);
+        return clan?._id;
+    }
+    else {
+        return null;
+    }
+}
+
 const editClan = () => {
     return;
+}
+
+const getAllClans = () => {
+    return Clan.find({});
 }
 
 const deleteAllClans = () => {
@@ -28,5 +50,10 @@ const deleteAllClans = () => {
 
 module.exports = {
     addClan,
-    getClanByDiscordGuildId
+    getClanByDiscordGuildId,
+    getClanByLineBoardId,
+    getClanIdByClanIdentifier,
+    editClan,
+    deleteAllClans,
+    getAllClans
 }

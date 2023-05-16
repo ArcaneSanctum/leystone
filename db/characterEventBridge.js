@@ -1,3 +1,5 @@
+const { CharacterEventBridge } = require('../models');
+
 const deleteCharacterEventBridgesByEventId = (eventId) => {
     return CharacterEventBridge.deleteMany({ event: eventId });
 }

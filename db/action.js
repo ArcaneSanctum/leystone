@@ -1,20 +1,29 @@
-const addAction = async (config) => {
-    const newAction = new Action(config);
+const { Action } = require('../models');
+
+const addAction = async (config, clanId) => {
+    const newAction = new Action({
+        ...config,
+        clan: clanId
+    });
     
     const actionData = await newAction.save();
 
     return actionData;
 }
 
-const getActionByName = (actionName) => {
+const getActionByName = (actionName, clanId) => {
     return Action.findOne({
-        name: actionName
+        name: actionName,
+        clan: clanId
     });
 }
 
-const getAllActions = () => {
-    return Action.find();
+const getAllActions = (clanId) => {
+    return Action.find({
+        clan: clanId
+    });
 }
+
 const deleteAllActions = () => {
     return Action.deleteMany({});
 }

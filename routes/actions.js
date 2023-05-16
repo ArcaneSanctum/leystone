@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { Action } = require('../models');
 const db = require('../db');
 
+
 const { BadRequestErrorHandler, InternalServerErrorHandler } = require('../util/errorHandlers');
 
 // Get all actions
@@ -27,6 +28,7 @@ router.get('/:name', async (req, res) => {
 // Create new action
 router.post('/', async (req, res) => {
     const name = req.body.name;
+    const clanid = db.util.getClanId(req);
 
     try {
         const newAction = await db.addAction({

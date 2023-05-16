@@ -1,16 +1,20 @@
-const db = require('../db');
-
+const event = require('./event');
+const character = require('./character');
+const characterEventBridge = require('./characterEventBridge');
+const action = require('./action');
+const clan = require('./clan');
+const user = require('./user');
 
 const clearDb = async () => {
-    await db.event.deleteAllEvents();
-    await db.character.deleteAllCharacters();
-    await db.characterEventBridge.deleteAllCharacterEventBridges();
-    await db.action.deleteAllActions();
-    await db.clan.deleteAllClans();
-    await db.user.deleteAllUsers();
+    await event.deleteAllEvents();
+    await character.deleteAllCharacters();
+    await characterEventBridge.deleteAllCharacterEventBridges();
+    await action.deleteAllActions();
+    await clan.deleteAllClans();
+    await user.deleteAllUsers();
 }
 
 
 module.exports = {
-    clearDb
+    clearDb,
 }

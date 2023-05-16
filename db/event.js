@@ -1,14 +1,23 @@
+const { Event, CharacterEventBridge } = require('../models');
+
+const character = require('./character');
+const characterEventBridge = require('./characterEventBridge');
+const util = require('../util/util');
+
 /* ------       ADD FUNCTIONS       ------- */
-const addEvent = async (action, characterIds) => {
+const addEvent = async (action, characterIds, clanId) => {
     const newEvent = new Event({
         name: action.name, 
-        categoryValues: action.categoryValues
+        categoryValues: action.categoryValues,
+        clan: clanId
     });
     
     const eventData = await newEvent.save();
 
+    console.log('characters', characterIds);
+
     await CharacterEventBridge.insertMany(
-        characterIds.map(characterId => ({character: characterId, event: eventData._id, timestamp: eventData.timestamp}))
+        characterIds.map(characterId => ({character: characterId._id, event: eventData._id, timestamp: eventData.timestamp}))
     );
 
     return eventData;
@@ -20,10 +29,10 @@ const getEventById = (id) => {
 }
 
 const getEventsByCharacterUsername = async (username, config = {}) =>  {
-    const character = await getCharacterByUsername(username);
+    const character = await character.getCharacterByUsername(username);
     const characterId = character._id;
 
-    const nicknames = await getCharacterNicknamesByUsername(username);
+    const nicknames = await character.getCharacterNicknamesByUsername(username);
 
     const query = {
         character: {
@@ -70,12 +79,12 @@ const getEventsByCharacterUsername = async (username, config = {}) =>  {
 }
 
 const editEvent = async (id, characterIds, timestamp) => {
-    const oldEvent = await db.getEventById(id);
-    const oldCharacterList = await db.getCharactersByEventId(id);
+    const oldEvent = await getEventById(id);
+    const oldCharacterList = await character.getCharactersByEventId(id);
     const oldCharacterIds = oldCharacterList.map(character => character._id)
 
     const isTimestampDirty = String(timestamp) !== String(oldEvent.timestamp);
-    const diff = getArrayDifference(oldCharacterIds.map(id => id.toString()), characterIds.map(character => character._id.toString()));
+    const diff = util.getArrayDifference(oldCharacterIds.map(id => id.toString()), characterIds.map(character => character._id.toString()));
      
     if (isTimestampDirty) {
         const editedEvent = {
@@ -95,7 +104,7 @@ const editEvent = async (id, characterIds, timestamp) => {
     if (diff.removed)
         await CharacterEventBridge.deleteMany({character: { $in: diff.removed.map(stringId => new ObjectId(stringId))}, event: id});
 
-    return db.getEventById(id);
+    return getEventById(id);
 }
 
 const deleteAllEvents = () => {
@@ -103,7 +112,7 @@ const deleteAllEvents = () => {
 }
 
 const deleteEventById = async (id) => {
-    await deleteCharacterEventBridgesByEventId(id);
+    await characterEventBridge.deleteCharacterEventBridgesByEventId(id);
     return Event.deleteOne({_id: id});
 }
 

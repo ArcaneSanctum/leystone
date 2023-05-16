@@ -15,20 +15,26 @@ database.once('connected', async () => {
 
     const db = require('./db');
 
+    console.log('DB: ', db);
     await db.util.clearDb();
 
-    const characters = await db.addCharacters(['rbm', 'llama']);
-    const Gelebron = await db.addAction({name: 'Gelebron', categoryValues: {
+    const clan = await db.clan.addClan("Test Clan", "001");
+
+    const characters = await db.character.addCharacters(['rbm', 'llama'], clan.id);
+    const Gelebron = await db.action.addAction({name: 'Gelebron', categoryValues: {
         'RAID': 1,
         'EDL': 7
-    }});
-    const Snorri = await db.addAction({name: 'Snorri', categoryValues: {
+    }}, clan.id);
+    const Snorri = await db.action.addAction({name: 'Snorri', categoryValues: {
         'RAID': 1,
         'LOWEDL': 4
-    }});
+    }}, clan.id);
 
-    await db.addEvent(Gelebron, [characters.find(x => x.username === 'rbm'), characters.find(x => x.username === 'llama')]);
-    await db.addEvent(Snorri, [characters.find(x => x.username === 'rbm'), characters.find(x => x.username === 'llama')]);
+    const rbm = await db.character.getCharacterByUsername('rbm');
+    const llama = await db.character.getCharacterByUsername('llama');
+
+    await db.event.addEvent(Gelebron, [rbm, llama], clan.id);
+    await db.event.addEvent(Snorri, [rbm, llama], clan.id);
 
     const filterByActionGelebron = '?config=%7B%22actionNames%22%3A%5B%22Gelebron%22%5D%7D';
     const filterByCategoryRaid = '?config=%7B%22categories%22%3A%5B%22RAID%22%5D%7D';
@@ -57,6 +63,10 @@ app.use('/characters', charactersRouter);
 app.use('/events', eventsRouter);
 app.use('/actions', actionsRouter);
 app.use('/clans', clansRouter);
+
+//must come last
+const errorHandler = require('./middleware/error');
+app.use(errorHandler);
 
 app.listen(process.env.PORT, () => {
     console.log(`Server Started at port ${process.env.PORT}`);

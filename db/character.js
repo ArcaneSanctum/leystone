@@ -1,13 +1,18 @@
-const addCharacters = (usernames) => {
+const { Character, CharacterEventBridge } = require('../models');
+
+const addCharacters = (usernames, clanId) => {
     return Character.insertMany(
-        usernames.map(username => ({username}))
+        usernames.map(username => ({
+            username,
+            clan: clanId
+        }))
     );
 }
 
-const getNewCharacters = async (usernames) => {
+const getNewCharacters = async (usernames, clanId) => {
     return await usernames.reduce(async (newCharacters, currentUsername) => {
         newCharacters = await newCharacters;
-        return (await characterDoesNotExist(currentUsername)) ? newCharacters.concat([currentUsername]) : newCharacters;
+        return (await characterDoesNotExist(currentUsername, clanId)) ? newCharacters.concat([currentUsername]) : newCharacters;
     }, Promise.resolve([]));
 }
 
@@ -19,11 +24,12 @@ const getCharacterByUsername = (username) => {
     return Character.findOne({username: username});
 }
 
-const getCharacterIdsByUsernames = (usernames) => {
+const getCharacterIdsByUsernames = (usernames, clanId) => {
     return Character.find({
         username: {
             $in: usernames
-        }
+        },
+        clan: clanId
     }, '_id');
 }
 
@@ -36,12 +42,15 @@ const getCharactersByEventId = async (eventId) => {
     });
 }
 
-const characterDoesNotExist = async (username) => {
-    return ! ( await characterExists(username) );
+const characterDoesNotExist = async (username, clanId) => {
+    return ! ( await characterExists(username, clanId) );
 }
 
-const characterExists = (username) => {
-    return Character.exists({username});
+const characterExists = (username, clanId) => {
+    return Character.exists({
+        username,
+        clan: clanId
+    });
 }
 
 const getCharacterNicknamesByUsername = (username) => {

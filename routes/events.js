@@ -1,7 +1,9 @@
 const router = require('express').Router();
 const { ObjectId } = require('mongoose').Types;
-const { Character, Event } = require('../models');
+const { Event } = require('../models');
 const db = require('../db');
+
+const { verify } = require('../middleware/auth');
 
 const { BadRequestErrorHandler, InternalServerErrorHandler } = require('../util/errorHandlers');
 
@@ -34,30 +36,31 @@ router.get('/:id/characters', async(req, res) => {
 });
 
 // Create new event
-router.post('/', async (req, res) => {
+router.post('/', verify, async (req, res) => {
     const actionName = req.body.actionName;
     const characterUsernames = req.body.usernames;
+    const clanId = req.clanId;
 
     try {
         //check for action
-        const action = await db.getActionByName(actionName);
+        const action = await db.action.getActionByName(actionName, clanId);
         if (action === null) {
             return BadRequestErrorHandler(res)(`Invalid action name "${actionName}".`);
         }
 
         //add new users to database
-        const newUsernames = await db.getNewCharacters(characterUsernames);
-        await db.addCharacters(newUsernames);
+        const newUsernames = await db.character.getNewCharacters(characterUsernames, clanId);
+        await db.character.addCharacters(newUsernames, clanId);
 
         //retreive character Object IDs use to build CharacterEventBridges
-        const characterIds = await db.getCharacterIdsByUsernames(characterUsernames);
+        const characterIds = await db.character.getCharacterIdsByUsernames(characterUsernames, clanId);
 
-        const eventData = await db.addEvent(action, characterIds);
+        const eventData = await db.event.addEvent(action, characterIds, clanId);
 
         res.json({
             event: eventData,
             newCharacters: newUsernames
-        }) 
+        });
     }
     catch (error) {
         BadRequestErrorHandler(res)(error);
