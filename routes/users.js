@@ -2,20 +2,19 @@ const router = require('express').Router();
 const { Character, Event, CharacterEventBridge } = require('../models');
 const db = require('../db');
 
-const ErrorResponse = require('../util/ErrorResponse');
 const { BadRequestErrorHandler, InternalServerErrorHandler } = require('../util/errorHandlers');
 
 // Get all characters
-router.get('/', async (req, res, next) => {
+router.get('/', async (req, res) => {
     try {
         const allCharacters = await db.getAllCharacters();
         res.json(allCharacters);
     } catch (error) {
-        return next(new ErrorResponse("Server Error", 500));
+        BadRequestErrorHandler(res)(error);
     }
 });
 
-router.get('/:username', async (req, res) => {
+router.get('/:discordGuildId', async (req, res) => {
     try {
         const character = await db.getCharacterByUsername(req.params.username);
         res.json(character);

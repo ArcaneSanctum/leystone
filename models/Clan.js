@@ -5,15 +5,20 @@ const clanSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+        trim: true,
+        minlength: 1
+    },
+    discordGuildId: {
+        type: String,
+        required: true,
         unique: true,
         trim: true,
         minlength: 1
     },
-    categoryValues: {
-        type: Map,
-        of: Number,
-        required: true
-    },
+    lineBoardId: {
+        type: String,
+        required: false
+    }
 }, {
     timestamps: true
 });
